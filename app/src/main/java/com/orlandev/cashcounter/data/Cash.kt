@@ -1,5 +1,16 @@
 package com.orlandev.cashcounter.data
 
+/**
+ * A Cash is a type of money that has a type and a quantity.
+ * 
+ * The type of money is defined by the CashType enum.
+ * 
+ * The quantity is defined by the cant property.
+ * 
+ * The calculate() method returns the value of the cash.
+ * @property {CashType} type - CashType
+ * @property {Long} cant - The amount of money of that type.
+ */
 data class Cash(
     val type: CashType,
     val cant: Long
@@ -9,8 +20,8 @@ data class Cash(
     }
 }
 
-object CashPrinter {
-    fun desgloseMinBills(money: Long): HashMap<Int, Long> {
+object CashBreakdown {
+    fun breakdownMinBills(money: Long): HashMap<Int, Long> {
 
         var restOfMoney = money
 
