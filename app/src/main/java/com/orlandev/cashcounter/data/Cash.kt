@@ -52,7 +52,6 @@ object CashBreakdown {
 }
 
 //Extension
-
 fun List<Cash>.sumAll(): Long {
     return this.sumOf {
         it.calculate()

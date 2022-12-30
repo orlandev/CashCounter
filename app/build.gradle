@@ -63,7 +63,9 @@ dependencies {
     implementation "androidx.activity:activity-compose:$activity_compose"
     implementation "androidx.compose.foundation:foundation"
     implementation "androidx.compose.ui:ui"
+    debugImplementation "androidx.compose.ui:ui-tooling"
     implementation "androidx.compose.ui:ui-tooling-preview"
+
     implementation "androidx.compose.ui:ui-util"
     implementation "androidx.compose.material:material"
     implementation "androidx.compose.material3:material3"

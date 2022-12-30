@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">CashCounter</string>
+    <string name="save_text">Guardar</string>
 </resources>
