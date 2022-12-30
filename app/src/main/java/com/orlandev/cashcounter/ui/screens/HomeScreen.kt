@@ -10,9 +10,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,15 +20,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.orlandev.cashcounter.R
+import com.orlandev.cashcounter.data.Cash
 import com.orlandev.cashcounter.data.cashTypesInList
 import com.orlandev.cashcounter.ui.theme.CashCounterTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen() {
+
     val finalCount = remember {
         mutableStateOf("$0")
     }
+
+    val listOfValues = cashTypesInList()
+
+    val textFieldInitValues = listOfValues.map {
+        Cash(it, 0)
+    }
+
+    val valueStateList =
+        remember { mutableStateListOf<Cash>().apply { addAll(textFieldInitValues) } }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -67,7 +77,12 @@ fun HomeScreen() {
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = {
+                        for (i in valueStateList.indices) {
+                            valueStateList[i] = valueStateList[i].copy(cant = 0)
+                        }
+                        finalCount.value = "$0"
+                    }) {
                         Icon(imageVector = Icons.Default.Add, contentDescription = "New")
                     }
                 }
@@ -85,12 +100,6 @@ fun HomeScreen() {
     ) { paddingValues ->
 
 
-        val listOfValues = cashTypesInList()
-
-        val (txt, SetTxt) = remember {
-            mutableStateOf("")
-        }
-
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -100,8 +109,9 @@ fun HomeScreen() {
         ) {
 
 
-            listOfValues.forEach { cashType ->
+            listOfValues.forEachIndexed { index, cashType ->
                 item {
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -125,12 +135,23 @@ fun HomeScreen() {
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(8.dp),
-                                value = txt,
+                                value = valueStateList[index].cant.toString(),
                                 singleLine = true,
                                 maxLines = 1,
                                 keyboardActions = KeyboardActions(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                onValueChange = SetTxt,
+                                onValueChange = {
+                                    if (it.isNotEmpty()) {
+                                        valueStateList[index] =
+                                            valueStateList[index].copy(cant = it.toLong())
+                                    } else {
+                                        valueStateList[index] = valueStateList[index].copy(cant = 0)
+                                    }
+                                    val result = valueStateList.sumOf { currentCash ->
+                                        currentCash.calculate()
+                                    }
+                                    finalCount.value = "$ $result"
+                                },
                                 textStyle = MaterialTheme.typography.titleMedium,
 
                                 )
@@ -141,8 +162,6 @@ fun HomeScreen() {
 
         }
     }
-
-
 }
 
 @Preview(showBackground = true)
