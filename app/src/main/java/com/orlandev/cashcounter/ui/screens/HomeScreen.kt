@@ -23,6 +23,8 @@ import com.orlandev.cashcounter.R
 import com.orlandev.cashcounter.data.Cash
 import com.orlandev.cashcounter.data.cashTypesInList
 import com.orlandev.cashcounter.ui.theme.CashCounterTheme
+import com.orlandev.cashcounter.utils.MAX_DIGITS_NUMBER
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -142,14 +144,17 @@ fun HomeScreen() {
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 onValueChange = {
                                     if (it.isNotEmpty()) {
-                                        valueStateList[index] =
-                                            valueStateList[index].copy(cant = it.toLong())
+                                        if (it.length <= MAX_DIGITS_NUMBER) {
+                                            valueStateList[index] =
+                                                valueStateList[index].copy(cant = it.toLong())
+                                        }
                                     } else {
                                         valueStateList[index] = valueStateList[index].copy(cant = 0)
                                     }
                                     val result = valueStateList.sumOf { currentCash ->
                                         currentCash.calculate()
                                     }
+
                                     finalCount.value = "$ $result"
                                 },
                                 textStyle = MaterialTheme.typography.titleMedium,
