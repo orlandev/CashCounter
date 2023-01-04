@@ -1,5 +1,7 @@
 package com.orlandev.cashcounter.ui.screens
 
+import android.content.Context
+import android.text.format.DateUtils
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -24,6 +27,7 @@ import com.orlandev.cashcounter.data.Cash
 import com.orlandev.cashcounter.data.cashTypesInList
 import com.orlandev.cashcounter.ui.theme.CashCounterTheme
 import com.orlandev.cashcounter.utils.MAX_DIGITS_NUMBER
+import com.orlandev.cashcounter.utils.ShareIntent
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +35,7 @@ import com.orlandev.cashcounter.utils.MAX_DIGITS_NUMBER
 fun HomeScreen() {
 
     val finalCount = remember {
-        mutableStateOf("$0")
+        mutableStateOf("$ 0")
     }
 
     val listOfValues = cashTypesInList()
@@ -42,6 +46,9 @@ fun HomeScreen() {
 
     val valueStateList =
         remember { mutableStateListOf<Cash>().apply { addAll(textFieldInitValues) } }
+
+    val context = LocalContext.current
+
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -58,25 +65,35 @@ fun HomeScreen() {
                 },
                 actions = {
 
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(
+                        enabled = finalCount.value != "$ 0", onClick = {
+
+                            val strToShare = cashPrint(context, valueStateList.toList())
+
+                            ShareIntent.shareIt(context, strToShare, "CashCounter")
+
+                        }) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = "Share",
                         )
                     }
 
-                    IconButton(onClick = { /*TODO*/ }) {
+                    /*    IconButton(onClick = { *//*TODO*//* }) {
                         Icon(
                             imageVector = Icons.Default.History,
                             contentDescription = "History",
                         )
-                    }
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(
-                            imageVector = Icons.Default.Send,
-                            contentDescription = "Send",
-                        )
-                    }
+                    }*/
+                    /*  IconButton(onClick = {
+
+
+                      }) {
+                          Icon(
+                              imageVector = Icons.Default.Send,
+                              contentDescription = "Send",
+                          )
+                      }*/
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -92,15 +109,39 @@ fun HomeScreen() {
             )
         },
         floatingActionButton = {
-            ExtendedFloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
-                Spacer(modifier = Modifier.size(10.dp))
-                Text(text = stringResource(id = R.string.save_text))
+            /* ExtendedFloatingActionButton(onClick = {
+
+                 for (i in valueStateList.indices) {
+                     valueStateList[i] = valueStateList[i].copy(cant = 0)
+                 }
+                 finalCount.value = "$0"
+
+             }) {
+                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
+                 Spacer(modifier = Modifier.size(10.dp))
+                 Text(text = stringResource(id = R.string.save_text))
+             }*/
+        },
+        bottomBar = {
+            Column(modifier = Modifier) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.author),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                    style = MaterialTheme.typography.labelSmall
+                )
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(id = R.string.phone),
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
 
     ) { paddingValues ->
-
 
         LazyColumn(
             modifier = Modifier
@@ -109,7 +150,6 @@ fun HomeScreen() {
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
 
             listOfValues.forEachIndexed { index, cashType ->
                 item {
@@ -165,8 +205,48 @@ fun HomeScreen() {
                 }
             }
 
+            item {
+                Spacer(modifier = Modifier.size(10.dp))
+            }
         }
+
+
     }
+}
+
+fun cashPrint(context: Context, listOfCash: List<Cash>): String {
+
+    val result = StringBuilder()
+
+    listOfCash.forEach {
+        val str = it.type.value.toString()
+        var spaces = ""
+        val maxSpaces = (4 - str.length) + 1
+        repeat((0..maxSpaces).count()) {
+            spaces += "-"
+        }
+
+        result.append("$str $spaces---->  ${it.cant}  =  $${it.calculate()} \n")
+    }
+    val total = listOfCash.sumOf { it.calculate() }
+    result.append("-----------------------\n")
+    result.append("")
+    result.append("Total: $$total \n")
+    result.append("")
+    result.append(
+        DateUtils.formatDateTime(
+            context,
+            System.currentTimeMillis(),
+            DateUtils.FORMAT_SHOW_DATE
+        ) + " - " +
+                DateUtils.formatDateTime(
+                    context,
+                    System.currentTimeMillis(),
+                    DateUtils.FORMAT_SHOW_TIME
+                )
+    )
+
+    return result.toString()
 }
 
 @Preview(showBackground = true)

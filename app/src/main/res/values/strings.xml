@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">CashCounter</string>
     <string name="save_text">Guardar</string>
+    <string name="phone">+5354074127</string>
+    <string name="author">Creado por Orlando N. Rodriguez</string>
 </resources>
