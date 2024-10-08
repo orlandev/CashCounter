@@ -50,42 +50,41 @@ fun HomeScreen() {
     val context = LocalContext.current
 
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            LargeTopAppBar(
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                title = {
-                    Text(text = finalCount.value)
-                },
-                actions = {
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        LargeTopAppBar(colors = TopAppBarDefaults.largeTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+        ), title = {
+            Text(text = finalCount.value)
+        }, actions = {
 
-                    IconButton(
-                        enabled = finalCount.value != "$ 0", onClick = {
+            IconButton(enabled = finalCount.value != "$ 0", onClick = {
 
-                            val strToShare = cashPrint(context, valueStateList.toList())
+                val strToShare = cashPrint(
+                    listOfCash = valueStateList.toList(), date = DateUtils.formatDateTime(
+                        context, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_DATE
+                    ) + " - " + DateUtils.formatDateTime(
+                        context, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
+                    )
+                )
 
-                            ShareIntent.shareIt(context, strToShare, "CashCounter")
+                ShareIntent.shareIt(context, strToShare, "CashCounter")
 
-                        }) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = "Share",
-                        )
-                    }
+            }) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share",
+                )
+            }
 
-                    /*    IconButton(onClick = { *//*TODO*//* }) {
+            /*    IconButton(onClick = { *//*TODO*//* }) {
                         Icon(
                             imageVector = Icons.Default.History,
                             contentDescription = "History",
                         )
-                    }*/
-                    /*  IconButton(onClick = {
+                    }*//*  IconButton(onClick = {
 
 
                       }) {
@@ -94,127 +93,115 @@ fun HomeScreen() {
                               contentDescription = "Send",
                           )
                       }*/
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        for (i in valueStateList.indices) {
-                            valueStateList[i] = valueStateList[i].copy(cant = 0)
-                        }
-                        finalCount.value = "$0"
-                    }) {
-                        Icon(imageVector = Icons.Default.Add, contentDescription = "New")
-                    }
+        }, navigationIcon = {
+            IconButton(onClick = {
+                for (i in valueStateList.indices) {
+                    valueStateList[i] = valueStateList[i].copy(cant = 0)
                 }
-
-            )
-        },
-        floatingActionButton = {
-            /* ExtendedFloatingActionButton(onClick = {
-
-                 for (i in valueStateList.indices) {
-                     valueStateList[i] = valueStateList[i].copy(cant = 0)
-                 }
-                 finalCount.value = "$0"
-
-             }) {
-                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
-                 Spacer(modifier = Modifier.size(10.dp))
-                 Text(text = stringResource(id = R.string.save_text))
-             }*/
-        },
-        bottomBar = {
-            Column(modifier = Modifier) {
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.author),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.labelSmall
-                )
-                Text(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(id = R.string.phone),
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                    style = MaterialTheme.typography.labelSmall
-                )
+                finalCount.value = "$0"
+            }) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "New")
             }
         }
 
+        )
+    }, floatingActionButton = {
+        /* ExtendedFloatingActionButton(onClick = {
+
+             for (i in valueStateList.indices) {
+                 valueStateList[i] = valueStateList[i].copy(cant = 0)
+             }
+             finalCount.value = "$0"
+
+         }) {
+             Icon(imageVector = Icons.Default.Save, contentDescription = "Save")
+             Spacer(modifier = Modifier.size(10.dp))
+             Text(text = stringResource(id = R.string.save_text))
+         }*/
+    }, bottomBar = {
+        Column(modifier = Modifier) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.author),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                style = MaterialTheme.typography.labelSmall
+            )
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(id = R.string.phone),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+
     ) { paddingValues ->
 
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-
             listOfValues.forEachIndexed { index, cashType ->
-                item {
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Text(
+                        text = cashType.value.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(2f),
+                        textAlign = TextAlign.Center
+                    )
+                    Box(
+                        modifier = Modifier
+                            .height(40.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .weight(2f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = cashType.value.toString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.weight(2f),
-                            textAlign = TextAlign.Center
-                        )
-                        Box(
+                        BasicTextField(
                             modifier = Modifier
-                                .height(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer)
-                                .weight(2f),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            BasicTextField(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(8.dp),
-                                value = valueStateList[index].cant.toString(),
-                                singleLine = true,
-                                maxLines = 1,
-                                keyboardActions = KeyboardActions(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                onValueChange = {
-                                    if (it.isNotEmpty()) {
-                                        if (it.length <= MAX_DIGITS_NUMBER) {
-                                            valueStateList[index] =
-                                                valueStateList[index].copy(cant = it.toLong())
-                                        }
-                                    } else {
-                                        valueStateList[index] = valueStateList[index].copy(cant = 0)
+                                .fillMaxSize()
+                                .padding(8.dp),
+                            value = valueStateList[index].cant.toString(),
+                            singleLine = true,
+                            maxLines = 1,
+                            keyboardActions = KeyboardActions(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            onValueChange = {
+                                if (it.isNotEmpty()) {
+                                    if (it.length <= MAX_DIGITS_NUMBER) {
+                                        valueStateList[index] =
+                                            valueStateList[index].copy(cant = it.toLong())
                                     }
-                                    val result = valueStateList.sumOf { currentCash ->
-                                        currentCash.calculate()
-                                    }
+                                } else {
+                                    valueStateList[index] = valueStateList[index].copy(cant = 0)
+                                }
+                                val result = valueStateList.sumOf { currentCash ->
+                                    currentCash.calculate()
+                                }
 
-                                    finalCount.value = "$ $result"
-                                },
-                                textStyle = MaterialTheme.typography.titleMedium,
+                                finalCount.value = "$ $result"
+                            },
+                            textStyle = MaterialTheme.typography.titleMedium,
 
-                                )
-                        }
+                            )
                     }
                 }
             }
-
-            item {
-                Spacer(modifier = Modifier.size(10.dp))
-            }
         }
-
-
     }
 }
 
-fun cashPrint(context: Context, listOfCash: List<Cash>): String {
+
+fun cashPrint(listOfCash: List<Cash>, date: String): String {
 
     val result = StringBuilder()
 
@@ -234,16 +221,7 @@ fun cashPrint(context: Context, listOfCash: List<Cash>): String {
     result.append("Total: $$total \n")
     result.append("")
     result.append(
-        DateUtils.formatDateTime(
-            context,
-            System.currentTimeMillis(),
-            DateUtils.FORMAT_SHOW_DATE
-        ) + " - " +
-                DateUtils.formatDateTime(
-                    context,
-                    System.currentTimeMillis(),
-                    DateUtils.FORMAT_SHOW_TIME
-                )
+        date
     )
 
     return result.toString()
