@@ -1,14 +1,14 @@
 package com.orlandev.cashcounter.ui.screens
 
-import android.content.Context
-import android.text.format.DateUtils
+import android.view.Surface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -16,26 +16,32 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.orlandev.cashcounter.R
 import com.orlandev.cashcounter.data.Cash
 import com.orlandev.cashcounter.data.cashTypesInList
 import com.orlandev.cashcounter.ui.theme.CashCounterTheme
+import com.orlandev.cashcounter.utils.Date
+import com.orlandev.cashcounter.utils.ICashPrint
 import com.orlandev.cashcounter.utils.MAX_DIGITS_NUMBER
 import com.orlandev.cashcounter.utils.ShareIntent
+import com.orlandev.cashcounter.utils.nonScaledSp
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(homeViewModel: HomeViewModel, cashPrint: ICashPrint) {
 
     val finalCount = remember {
-        mutableStateOf("$ 0")
+        mutableStateOf("$0")
     }
 
     val listOfValues = cashTypesInList()
@@ -49,6 +55,10 @@ fun HomeScreen() {
 
     val context = LocalContext.current
 
+    var showOtherCant by remember {
+        mutableStateOf(false)
+    }
+
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         LargeTopAppBar(colors = TopAppBarDefaults.largeTopAppBarColors(
@@ -57,17 +67,17 @@ fun HomeScreen() {
             actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
             navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
         ), title = {
-            Text(text = finalCount.value)
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = finalCount.value,
+                style = TextStyle(fontSize = 36.nonScaledSp, textAlign = TextAlign.Center)
+            )
         }, actions = {
 
             IconButton(enabled = finalCount.value != "$ 0", onClick = {
 
-                val strToShare = cashPrint(
-                    listOfCash = valueStateList.toList(), date = DateUtils.formatDateTime(
-                        context, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_DATE
-                    ) + " - " + DateUtils.formatDateTime(
-                        context, System.currentTimeMillis(), DateUtils.FORMAT_SHOW_TIME
-                    )
+                val strToShare = cashPrint.print(
+                    listOfCash = valueStateList.toList(), date = Date.getDate(context = context)
                 )
 
                 ShareIntent.shareIt(context, strToShare, "CashCounter")
@@ -147,6 +157,16 @@ fun HomeScreen() {
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             listOfValues.forEachIndexed { index, cashType ->
+                if (!showOtherCant && index >= listOfValues.size - 3) {
+                    MoreSelector(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp)
+                    ) {
+                        showOtherCant = !showOtherCant
+                    }
+                    return@Column
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -200,37 +220,17 @@ fun HomeScreen() {
     }
 }
 
-
-fun cashPrint(listOfCash: List<Cash>, date: String): String {
-
-    val result = StringBuilder()
-
-    listOfCash.forEach {
-        val str = it.type.value.toString()
-        var spaces = ""
-        val maxSpaces = (4 - str.length) + 1
-        repeat((0..maxSpaces).count()) {
-            spaces += "-"
-        }
-
-        result.append("$str $spaces---->  ${it.cant}  =  $${it.calculate()} \n")
-    }
-    val total = listOfCash.sumOf { it.calculate() }
-    result.append("-----------------------\n")
-    result.append("")
-    result.append("Total: $$total \n")
-    result.append("")
-    result.append(
-        date
-    )
-
-    return result.toString()
-}
-
-@Preview(showBackground = true)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreenPreview() {
-    CashCounterTheme {
-        HomeScreen()
+fun MoreSelector(modifier: Modifier = Modifier, onClick: () -> Unit) {
+    Surface(modifier = modifier, onClick = onClick, color = Color.Transparent) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            HorizontalDivider(modifier = Modifier.align(Alignment.Center))
+            Icon(
+                Icons.Default.Add,
+                contentDescription = null,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
     }
 }

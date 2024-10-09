@@ -20,36 +20,7 @@ data class Cash(
     }
 }
 
-object CashBreakdown {
 
-    //TODO CREATE A FUNCTION TO GIVE THE GREATEST AMOUNT OF BILLS POSSIBLE
-
-
-    fun breakdownMinBills(money: Long): HashMap<Int, Long> {
-
-        var restOfMoney = money
-
-        val listOfMoneyValues = cashTypesInList()
-
-        val result: HashMap<Int, Long> = HashMap()
-
-        for (cashType in listOfMoneyValues) {
-
-            if (restOfMoney >= cashType.value) {
-
-                val rest = restOfMoney / cashType.value
-
-                result[cashType.value] = rest
-
-                //result.append("\n${cashType.value}  ------->  $rest")
-                restOfMoney = money % cashType.value
-
-            }
-        }
-
-        return result
-    }
-}
 
 //Extension
 fun List<Cash>.sumAll(): Long {
@@ -60,16 +31,16 @@ fun List<Cash>.sumAll(): Long {
 
 
 sealed class CashType(val value: Int) {
-    object D1000 : CashType(1000)
-    object D500 : CashType(500)
-    object D200 : CashType(200)
-    object D100 : CashType(100)
-    object D50 : CashType(50)
-    object D20 : CashType(20)
-    object D10 : CashType(10)
-    object D5 : CashType(5)
-    object D3 : CashType(3)
-    object D1 : CashType(1)
+    data object D1000 : CashType(1000)
+    data object D500 : CashType(500)
+    data object D200 : CashType(200)
+    data object D100 : CashType(100)
+    data object D50 : CashType(50)
+    data object D20 : CashType(20)
+    data object D10 : CashType(10)
+    data object D5 : CashType(5)
+    data object D3 : CashType(3)
+    data object D1 : CashType(1)
 }
 
 fun cashTypesInList(): List<CashType> {
