@@ -208,11 +208,10 @@ fun HomeScreen(homeViewModel: HomeViewModel, cashPrint: ICashPrint) {
                                     currentCash.calculate()
                                 }
 
-                                finalCount.value = "$ $result"
+                                finalCount.value = "$$result"
                             },
-                            textStyle = MaterialTheme.typography.titleMedium,
-
-                            )
+                            textStyle = MaterialTheme.typography.titleMedium
+                        )
                     }
                 }
             }
