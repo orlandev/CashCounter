@@ -4,7 +4,6 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.compose.compiler)
 }
-// LA CLAVE DE LA FORMA ES Qu35t64*05*L y el alias es sender
 android {
     namespace = "com.orlandev.cashcounter"
 
@@ -13,8 +12,8 @@ android {
         applicationId = "com.orlandev.cashcounter"
         minSdk = 24
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.2"
+        versionCode = 3
+        versionName = "1.0.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
