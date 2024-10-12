@@ -2,6 +2,7 @@ package com.orlandev.cashcounter
 
 import android.app.Application
 import com.orlandev.cashcounter.di.appModule
+import com.orlandev.cashcounter.di.dataRepositoryModule
 import com.orlandev.cashcounter.di.databaseModule
 import com.orlandev.cashcounter.di.viewModelsModule
 import org.koin.android.ext.koin.androidContext
@@ -17,7 +18,7 @@ class MainApp : Application() {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@MainApp)
-            modules(appModule, viewModelsModule, databaseModule)
+            modules(appModule, dataRepositoryModule, viewModelsModule, databaseModule)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.orlandev.cashcounter.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -47,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import com.orlandev.cashcounter.R
 import com.orlandev.cashcounter.data.Cash
 import com.orlandev.cashcounter.data.cashTypesInList
+import com.orlandev.cashcounter.data.database.entity.History
 import com.orlandev.cashcounter.utils.Date
 import com.orlandev.cashcounter.utils.ICashPrint
 import com.orlandev.cashcounter.utils.MAX_DIGITS_NUMBER
@@ -103,6 +106,21 @@ fun HomeScreen(
 
             }) {
                 Icon(Icons.Default.History, contentDescription = null)
+            }
+
+            IconButton(onClick = {
+                val historyToSave = cashPrint.print(
+                    listOfCash = valueStateList.toList(), date = Date.getDate(context = context)
+                )
+                homeViewModel.insertHistory(
+                    History(
+                        data = historyToSave, date = Date.now()
+                    )
+                )
+                Toast.makeText(context, "Datos guardados", Toast.LENGTH_LONG).show()
+
+            }) {
+                Icon(Icons.Default.Save, contentDescription = null)
             }
 
             IconButton(enabled = finalCount.value != "$ 0", onClick = {

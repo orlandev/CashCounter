@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(route = CashNavGraph.HistoryScreenRoute.route) {
-                            HistoryScreen()
+                            HistoryScreen() {
+                                navController.navigate(CashNavGraph.HomeScreenRoute.route)
+                            }
                         }
                     }
                 }
