@@ -26,3 +26,5 @@ class MainApp : Application() {
 
 //FIRMA APK_LIS
 //7D:44:84:B4:AA:4A:06:69:3F:78:42:4E:F4:29:64:8D:98:C0:33:18
+//alias orlando
+//clave Qu35t64*05*L
