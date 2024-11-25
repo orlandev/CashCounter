@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class History(
     @PrimaryKey(autoGenerate = true)
     val id: Long=0,
+    val title:String="",
     val data: String,
     val date:Long
 )

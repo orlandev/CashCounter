@@ -1,6 +1,5 @@
 package com.orlandev.cashcounter.ui.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +14,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.History
@@ -43,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -61,8 +61,9 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    homeViewModel: HomeViewModel = koinInject(),
+    homeViewModel: HomeViewModel,
     cashPrint: ICashPrint = koinInject(),
+    onNavToAddHistory: () -> Unit,
     onNavToHistory: () -> Unit
 ) {
 
@@ -112,12 +113,13 @@ fun HomeScreen(
                 val historyToSave = cashPrint.print(
                     listOfCash = valueStateList.toList(), date = Date.getDate(context = context)
                 )
-                homeViewModel.insertHistory(
-                    History(
-                        data = historyToSave, date = Date.now()
-                    )
-                )
-                Toast.makeText(context, "Datos guardados", Toast.LENGTH_LONG).show()
+
+                homeViewModel.historyToSave.value =
+                    History(data = historyToSave, title = "", date = Date.now())
+
+                onNavToAddHistory()
+
+                //Toast.makeText(context, "Datos guardados", Toast.LENGTH_LONG).show()
 
             }) {
                 Icon(Icons.Default.Save, contentDescription = null)
@@ -259,7 +261,11 @@ fun HomeScreen(
 
                                 finalCount.value = "$$result"
                             },
-                            textStyle = MaterialTheme.typography.titleMedium
+                            textStyle = TextStyle(
+                                fontSize = 16.nonScaledSp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
                         )
                     }
                 }
